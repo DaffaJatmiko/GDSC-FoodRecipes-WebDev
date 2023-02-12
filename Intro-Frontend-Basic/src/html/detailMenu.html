@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>Menu</title>
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../css/detailMenuApi.css" />
+  </head>
+  <body>
+    <div class="nav">
+      <ul>
+        <li><a href="./index.html">Home</a></li>
+      </ul>
+    </div>
+    <div class="container">
+      <img alt="" id="thumbnail" />
+      <div class="right-content">
+        <h1></h1>
+        <h2></h2>
+        <p></p>
+        <br />
+        <div class="steps">
+          <h2>Steps</h2>
+          <ol id="ingredients"></ol>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    (function () {
+      let params = new URL(document.location).searchParams;
+      let id = params.get('id');
+      const BASE_URI = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i=';
+      const getResponse = (response) => response.json();
+      const catchError = (err) => console.log(err);
+      const processJSON = (JSON) => {
+        const thumbnail = document.getElementById('thumbnail');
+        const ingredients = document.getElementById('ingredients');
+
+        const {
+          strMeal,
+          strMealThumb,
+          strCategory,
+          strArea,
+          strInstructions,
+          strYoutube,
+        } = JSON;
+        thumbnail.src = strMealThumb;
+        document.title = strMeal;
+        document.querySelector('h1').innerHTML = strMeal;
+        document.querySelector('h2').innerHTML = `${strCategory} | ${strArea}`;
+        document.querySelector('p').innerHTML = strInstructions;
+        console.log(JSON);
+        for (let i = 1; i <= 20; i++) {
+          if (
+            JSON[`strIngredient${i}`] != '' &&
+            JSON[`strIngredient${i}`] != null
+          ) {
+            let li = document.createElement('li');
+            li.innerHTML = `${JSON[`strIngredient${i}`]} - ${
+              JSON[`strMeasure${i}`]
+            }`;
+            ingredients.appendChild(li);
+          }
+        }
+        document.querySelector('Video').src = strYoutube;
+      };
+
+      const load_data = async (id) => {
+        await fetch(`${BASE_URI}${id}`)
+          .then((response) => getResponse(response))
+          .then((response) => processJSON(response.meals[0]))
+          .catch((err) => catchError);
+      };
+      load_data(id);
+    })();
+  </script>
+  <script src="../Js/searchbar.js"></script>
+</html>
